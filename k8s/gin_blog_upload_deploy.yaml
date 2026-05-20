@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gin-blog-upload
+  namespace: default
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: gin-blog-upload
+  template:
+    metadata:
+      labels:
+        app: gin-blog-upload
+    spec:
+      containers:
+        - name: gin-blog-upload
+          image: narutojxt/gin_blog_upload:v1.0.4
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9091
+          envFrom:
+            - configMapRef:
+                name: gin-blog-upload-config
+          env:
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-secret
+                  key: MINIO_ROOT_USER
+            - name: MINIO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-secret
+                  key: MINIO_ROOT_PASSWORD
+            - name: MINIO_PUBLIC_BASE
+              value: "http://192.168.32.141:30080/minio"
+          readinessProbe:
+            tcpSocket:
+              port: 9091
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 9091
+            initialDelaySeconds: 15
+            periodSeconds: 20

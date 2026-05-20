@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gin-blog-upload-config
+  namespace: default
+data:
+  UPLOAD_SERVICE_PORT: "9091"
+  UPLOAD_ROOT: "/app/uploads"
+  BASE_URL: "/files"
+  MAX_UPLOAD_MB: "10"
+  ALLOWED_EXT: ".jpg,.jpeg,.png,.gif,.webp,.pdf"
+
+  MINIO_ENDPOINT: "minio-svc:9000"
+  MINIO_BUCKET: "gin-blog-upload"
+  MINIO_USE_SSL: "false"
+  MINIO_PUBLIC_BASE: "http://192.168.32.141:30080/minio"
