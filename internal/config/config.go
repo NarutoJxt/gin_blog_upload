@@ -22,7 +22,7 @@ func Load() Config {
 		UploadRoot:      getEnv("UPLOAD_ROOT", "./uploads"),
 		MinioEndpoint:   getEnv("MINIO_ENDPOINT", "127.0.0.1:9000"),
 		MinioAccessKey:  getEnv("MINIO_ACCESS_KEY", "minioadmin"),
-		MinioSecretKey:  getEnv("MINIO_SECRET_KEY", "minioadmin"),
+		MinioSecretKey:  getEnv("MINIO_SECRET_KEY", "minioadmin123"),
 		MinioBucket:     getEnv("MINIO_BUCKET", "gin-blog-upload"),
 		MinioUseSSL:     getEnvBool("MINIO_USE_SSL", false),
 		MinioPublicBase: getEnv("MINIO_PUBLIC_BASE", ""),
@@ -43,4 +43,3 @@ func getEnvBool(key string, defaultVal bool) bool {
 	}
 	return val == "1" || val == "true" || val == "yes"
 }
-

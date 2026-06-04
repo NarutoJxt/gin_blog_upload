@@ -1,6 +1,8 @@
 # gin_blog_upload
 
-基于 Gin 的独立文件上传微服务，为 `gin_blog` / `gin_blog_fronted` 提供统一上传能力。文件存储在 **MinIO**，通过 HTTP 返回可访问 URL。
+基于 Gin 的独立文件上传微服务，为 [gin_blog](https://github.com/NarutoJxt/gin_blog/tree/master) / [gin_blog_fronted](https://github.com/NarutoJxt/gin_blog_fronted/tree/master) 提供统一上传能力。文件存储在 **MinIO**，通过 HTTP 返回可访问 URL。
+
+**仓库地址：** https://github.com/NarutoJxt/gin_blog_upload
 
 ## 功能概览
 
@@ -186,7 +188,7 @@ docker run -d --name gin_blog_upload \
 
 ## Kubernetes 部署
 
-清单位于 `k8s/` 目录，命名空间均为 `default`。
+清单位于 [`k8s/`](https://github.com/NarutoJxt/gin_blog_upload/tree/master/k8s) 目录，命名空间均为 `default`。
 
 ### StorageClass 与 local-path（MinIO PVC 前置条件）
 
@@ -338,19 +340,19 @@ kubectl delete -f minio_service.yaml -f minio_deploy.yaml -f minio-pesistent-vol
 
 ### 与主博客联动
 
-`gin_blog` 的 ConfigMap 需包含（不在本目录，需在主项目 k8s 中配置）：
+[`gin_blog`](https://github.com/NarutoJxt/gin_blog/tree/master) 的 ConfigMap 需包含（不在本目录，需在 [gin_blog/k8s](https://github.com/NarutoJxt/gin_blog/tree/master/k8s) 中配置）：
 
 ```yaml
 UPLOAD_SERVICE_URL: "http://gin-blog-upload-svc:9091/api/v1/files"
 ```
 
-前端 `gin_blog_fronted` 的 Nginx 需代理 `/minio/` → `minio-svc:9000`（见下文）。
+前端 [`gin_blog_fronted`](https://github.com/NarutoJxt/gin_blog_fronted/tree/master) 的 Nginx 需代理 `/minio/` → `minio-svc:9000`（见下文）。
 
 ## 前端 / Ingress / Nginx 接入
 
 ### 主后端转发（必须）
 
-`gin_blog` ConfigMap：
+[`gin_blog`](https://github.com/NarutoJxt/gin_blog/tree/master/k8s/backenf-config.yaml) ConfigMap：
 
 ```yaml
 UPLOAD_SERVICE_URL: "http://gin-blog-upload-svc:9091/api/v1/files"
@@ -358,7 +360,7 @@ UPLOAD_SERVICE_URL: "http://gin-blog-upload-svc:9091/api/v1/files"
 
 ### 前端 Nginx（NodePort 30080 场景）
 
-在 `gin_blog_fronted/nginx.conf` 中配置：
+在 [`gin_blog_fronted/nginx.conf`](https://github.com/NarutoJxt/gin_blog_fronted/blob/master/nginx.conf) 中配置：
 
 ```nginx
 location /api/ {
@@ -370,7 +372,7 @@ location /minio/ {
 }
 ```
 
-页面与图片均通过 `30080` 访问时，请在 `k8s/upload-config.yaml`（或 Deployment env）将 `MINIO_PUBLIC_BASE` 设为 `/minio` 或 `http://<节点IP>:30080/minio`。
+页面与图片均通过 `30080` 访问时，请在 [`k8s/upload-config.yaml`](https://github.com/NarutoJxt/gin_blog_upload/blob/master/k8s/upload-config.yaml)（或 Deployment env）将 `MINIO_PUBLIC_BASE` 设为 `/minio` 或 `http://<节点IP>:30080/minio`。
 
 ### Ingress（可选）
 
@@ -459,6 +461,21 @@ kubectl rollout status deploy/gin-blog-upload -n default
 kubectl set image deploy/gin-blog-upload -n default \
   gin-blog-upload=narutojxt/gin_blog_upload:v1.0.5
 kubectl rollout status deploy/gin-blog-upload -n default
+```
+
+## 相关仓库
+
+| 项目 | 地址 |
+|------|------|
+| **gin_blog_upload**（本仓库） | https://github.com/NarutoJxt/gin_blog_upload |
+| **gin_blog**（后端 API） | https://github.com/NarutoJxt/gin_blog/tree/master |
+| **gin_blog_fronted**（前端 + Ingress） | https://github.com/NarutoJxt/gin_blog_fronted/tree/master |
+
+克隆本仓库：
+
+```bash
+git clone https://github.com/NarutoJxt/gin_blog_upload.git
+cd gin_blog_upload
 ```
 
 ## License

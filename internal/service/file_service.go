@@ -83,10 +83,28 @@ func (s *FileService) EnsureBucket(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	if exists {
-		return nil
+	if !exists {
+		if err := s.minioClient.MakeBucket(ctx, s.bucket, minio.MakeBucketOptions{}); err != nil {
+			return err
+		}
 	}
-	return s.minioClient.MakeBucket(ctx, s.bucket, minio.MakeBucketOptions{})
+	return s.EnsurePublicReadPolicy(ctx)
+}
+
+// EnsurePublicReadPolicy allows anonymous GetObject so /minio/<bucket>/<object> works in browser.
+func (s *FileService) EnsurePublicReadPolicy(ctx context.Context) error {
+	policy := fmt.Sprintf(`{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {"AWS": ["*"]},
+      "Action": ["s3:GetObject"],
+      "Resource": ["arn:aws:s3:::%s/*"]
+    }
+  ]
+}`, s.bucket)
+	return s.minioClient.SetBucketPolicy(ctx, s.bucket, policy)
 }
 
 func (s *FileService) BuildPublicURL(objectName string) string {
